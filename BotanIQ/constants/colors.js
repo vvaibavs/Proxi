@@ -4,10 +4,10 @@ export const Colors = {
 
     dark: {
         text: '#d4d4d4',
-        title: '#fff',
+        title: '#33ff00ff',
         background: '#252231',
         navBackground: '#201e2b',
-        iconColour: '#9591a5',
+        iconColour: '#61ff53ff',
         iconColourFocused: '#fff',
         uiBackground: '#2f2b3d',
     },

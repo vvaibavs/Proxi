@@ -17,7 +17,7 @@ export default function Index() {
   return (
     <SafeAreaProvider style={{ backgroundColor: theme.background}}>
         <SafeAreaView>
-            <Text className="text-3xl self-center m-3" style={{color: theme.text}}>
+            <Text className="text-3xl self-center m-3" style={{color: theme.title}}>
                 Log In
             </Text>
             <View className="m-5" style={{}}>
@@ -26,6 +26,7 @@ export default function Index() {
                     className="rounded-md border-2 h-10"
                     placeholder="enter username"
                     onChangeText={newText => setUsername(newText)}
+                    style={{color: theme.text}}
                 >
                 </TextInput>
             </View>
@@ -35,6 +36,7 @@ export default function Index() {
                     className="rounded-md border-2 h-10"
                     placeholder="enter username"
                     onChangeText={newText => setPassword(newText)}
+                    style={{color: theme.text}}
 
                     ></TextInput>
             </View>

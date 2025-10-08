@@ -13,7 +13,7 @@ export default function RootLayout() {
         headerStyle: {backgroundColor: theme.navBackground},
         headerTintColor: theme.title
     }}>
-
+        <Stack.Screen name="index"/>
     </Stack>
   )
 }
