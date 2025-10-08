@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { Text, View, StyleSheet, TextInput } from "react-native";
+import { Text, View, StyleSheet, TextInput, useColorScheme } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { Colors } from "../constants/colors"
 
 export default function Index() {
+    const colorScheme = useColorScheme()
+    const theme = Colors[colorScheme ?? "light"]
 
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
@@ -12,13 +15,13 @@ export default function Index() {
         setUsername(event.target.value)
     }
   return (
-    <SafeAreaProvider>
+    <SafeAreaProvider style={{ backgroundColor: theme.background}}>
         <SafeAreaView>
-            <Text className="text-3xl self-center m-3">
+            <Text className="text-3xl self-center m-3" style={{color: theme.text}}>
                 Log In
             </Text>
-            <View className="m-5">
-                <Text>Username</Text>
+            <View className="m-5" style={{}}>
+                <Text style={{color: theme.text}}>Username</Text>
                 <TextInput
                     className="rounded-md border-2 h-10"
                     placeholder="enter username"
@@ -27,7 +30,7 @@ export default function Index() {
                 </TextInput>
             </View>
             <View className="m-5">
-                <Text>Password</Text>
+                <Text style={{color: theme.text}}>Password</Text>
                 <TextInput
                     className="rounded-md border-2 h-10"
                     placeholder="enter username"
