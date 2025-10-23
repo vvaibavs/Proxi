@@ -34,7 +34,7 @@ export default function Index() {
                 <Text style={{color: theme.text}}>Password</Text>
                 <TextInput
                     className="rounded-md border-2 h-10"
-                    placeholder="enter username"
+                    placeholder="enter password"
                     onChangeText={newText => setPassword(newText)}
                     style={{color: theme.text}}
 
