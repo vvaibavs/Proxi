@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Text, View, StyleSheet, TextInput, useColorScheme } from "react-native";
+import { Text, View, StyleSheet, TextInput, useColorScheme, TouchableOpacity } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { Colors } from "../constants/colors"
+import { Colors } from "../constants/colors";
+import { Link } from "expo-router";
 
 export default function Index() {
     const colorScheme = useColorScheme()
@@ -42,6 +43,13 @@ export default function Index() {
             </View>
             <Text>username:{username} password: {password}</Text>
 
+            <Link href="/dashboard" asChild>
+                <TouchableOpacity className="bg-blue-500 rounded-md p-3 m-5">
+                    <Text className="text-white text-center text-lg font-semibold">
+                        Go to Dashboard
+                    </Text>
+                </TouchableOpacity>
+            </Link>
 
         </SafeAreaView>
     </SafeAreaProvider>
