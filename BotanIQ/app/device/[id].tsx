@@ -1,7 +1,7 @@
-import { View, Text, ScrollView, useColorScheme } from "react-native";
+import { useLocalSearchParams } from "expo-router";
+import { ScrollView, Text, useColorScheme, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "../../constants/colors";
-import { useLocalSearchParams } from "expo-router";
 
 export default function DevicePage() {
     const colorScheme = useColorScheme();
@@ -11,10 +11,10 @@ export default function DevicePage() {
     // Mock device data based on ID
     const getDeviceData = (deviceId: string) => {
         const devices = {
-            "1": { name: "Living Room Sensor", type: "Temperature", status: "Online" },
-            "2": { name: "Kitchen Monitor", type: "Humidity", status: "Online" },
-            "3": { name: "Garden Controller", type: "Irrigation", status: "Offline" },
-            "4": { name: "Greenhouse Panel", type: "Lighting", status: "Online" },
+            "1": { name: "Device 1", type: "Temperature", status: "Online" },
+            "2": { name: "Device 2", type: "Humidity", status: "Online" },
+            "3": { name: "Device 3", type: "Irrigation", status: "Offline" },
+            "4": { name: "Device 4", type: "Lighting", status: "Online" },
         };
         return devices[deviceId as keyof typeof devices] || { name: "Unknown Device", type: "Unknown", status: "Offline" };
     };
@@ -36,9 +36,8 @@ export default function DevicePage() {
                             </Text>
                             <View className="flex-row items-center mt-2">
                                 <View
-                                    className={`w-3 h-3 rounded-full mr-2 ${
-                                        device.status === 'Online' ? 'bg-green-500' : 'bg-red-500'
-                                    }`}
+                                    className={`w-3 h-3 rounded-full mr-2 ${device.status === 'Online' ? 'bg-green-500' : 'bg-red-500'
+                                        }`}
                                 />
                                 <Text style={{ color: theme.text }}>
                                     {device.status}
