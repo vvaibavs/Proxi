@@ -23,8 +23,8 @@ export default function DevicePage() {
 
     return (
         <SafeAreaProvider style={{ backgroundColor: theme.background }}>
-            <SafeAreaView>
-                <ScrollView>
+            <SafeAreaView style={{ flex: 1 }}>
+                <ScrollView style={{ flex: 1 }}>
                     <View className="p-5">
                         {/* Header */}
                         <View className="mb-6">
