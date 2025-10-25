@@ -9,10 +9,10 @@ export default function Dashboard() {
 
     // Mock data for connected devices
     const connectedDevices = [
-        { id: 1, name: "Living Room Sensor", type: "Temperature", status: "Online" },
-        { id: 2, name: "Kitchen Monitor", type: "Humidity", status: "Online" },
-        { id: 3, name: "Garden Controller", type: "Irrigation", status: "Offline" },
-        { id: 4, name: "Greenhouse Panel", type: "Lighting", status: "Online" },
+        { id: 1, name: "Device 1", type: "Temperature", status: "Online" },
+        { id: 2, name: "Device 2", type: "Humidity", status: "Online" },
+        { id: 3, name: "Device 3", type: "Irrigation", status: "Offline" },
+        { id: 4, name: "Device 4", type: "Lighting", status: "Online" },
     ];
 
     return (
