@@ -1,25 +1,98 @@
 import { useLocalSearchParams } from "expo-router";
-import { ScrollView, Text, useColorScheme, View } from "react-native";
+import { ScrollView, Text, useColorScheme, View, ActivityIndicator, Alert } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "../../constants/colors";
+import { useAuth } from "@/contexts/AuthContext";
+import { useEffect, useState } from "react";
+
+interface Device {
+    deviceId: string;
+    deviceName: string;
+    deviceType: string;
+    status: string;
+    lastSeen: string;
+    location: string;
+    settings: Record<string, any>;
+}
 
 export default function DevicePage() {
     const colorScheme = useColorScheme();
     const theme = Colors[colorScheme ?? "light"];
     const { id } = useLocalSearchParams();
+    const { token } = useAuth();
 
-    // Mock device data based on ID
-    const getDeviceData = (deviceId: string) => {
-        const devices = {
-            "1": { name: "Device 1", type: "Temperature", status: "Online" },
-            "2": { name: "Device 2", type: "Humidity", status: "Online" },
-            "3": { name: "Device 3", type: "Irrigation", status: "Offline" },
-            "4": { name: "Device 4", type: "Lighting", status: "Online" },
-        };
-        return devices[deviceId as keyof typeof devices] || { name: "Unknown Device", type: "Unknown", status: "Offline" };
+    const [deviceData, setDeviceData] = useState<Device | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    const deviceID = id as string;
+    const API_BASE_URL = 'http://localhost:3000/api';
+
+    const getDeviceData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const response = await fetch(`${API_BASE_URL}/devices/${deviceID}`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to fetch device data');
+            }
+
+            const data = await response.json();
+            setDeviceData(data.device);
+        } catch (err) {
+            console.error('Error fetching device data:', err);
+            setError(err instanceof Error ? err.message : 'Failed to fetch device data');
+            Alert.alert('Error', 'Failed to load device data');
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const device = getDeviceData(id as string);
+    useEffect(() => {
+        if (deviceID && token) {
+            getDeviceData();
+        }
+    }, [deviceID, token]);
+
+    if (loading) {
+        return (
+            <SafeAreaProvider style={{ backgroundColor: theme.background }}>
+                <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <ActivityIndicator size="large" color={Colors.primary} />
+                    <Text className="mt-4 text-lg" style={{ color: theme.text }}>
+                        Loading device data...
+                    </Text>
+                </SafeAreaView>
+            </SafeAreaProvider>
+        );
+    }
+
+    if (error || !deviceData) {
+        return (
+            <SafeAreaProvider style={{ backgroundColor: theme.background }}>
+                <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <Text className="text-lg text-center mb-4" style={{ color: theme.text }}>
+                        {error || 'Device not found'}
+                    </Text>
+                    <Text
+                        className="text-blue-500 underline"
+                        onPress={getDeviceData}
+                        style={{ color: Colors.primary }}
+                    >
+                        Try Again
+                    </Text>
+                </SafeAreaView>
+            </SafeAreaProvider>
+        );
+    }
 
     return (
         <SafeAreaProvider style={{ backgroundColor: theme.background }}>
@@ -29,20 +102,28 @@ export default function DevicePage() {
                         {/* Header */}
                         <View className="mb-6">
                             <Text className="text-3xl font-bold mb-2" style={{ color: theme.title }}>
-                                {device.name}
+                                {deviceData.deviceName}
                             </Text>
                             <Text className="text-lg" style={{ color: theme.text }}>
-                                {device.type} • Device ID: {id}
+                                {deviceData.deviceType} • Device ID: {deviceData.deviceId}
                             </Text>
                             <View className="flex-row items-center mt-2">
                                 <View
-                                    className={`w-3 h-3 rounded-full mr-2 ${device.status === 'Online' ? 'bg-green-500' : 'bg-red-500'
-                                        }`}
+                                    className={`w-3 h-3 rounded-full mr-2 ${
+                                        deviceData.status === 'Online' ? 'bg-green-500' :
+                                        deviceData.status === 'Offline' ? 'bg-red-500' : 'bg-yellow-500'
+                                    }`}
                                 />
                                 <Text style={{ color: theme.text }}>
-                                    {device.status}
+                                    {deviceData.status}
                                 </Text>
                             </View>
+                            <Text className="text-sm mt-1" style={{ color: theme.text, opacity: 0.7 }}>
+                                Last seen: {new Date(deviceData.lastSeen).toLocaleString()}
+                            </Text>
+                            <Text className="text-sm" style={{ color: theme.text, opacity: 0.7 }}>
+                                Location: {deviceData.location}
+                            </Text>
                         </View>
 
                         {/* Data Visualization Section */}
@@ -67,7 +148,7 @@ export default function DevicePage() {
                                     style={{ backgroundColor: theme.background }}
                                 >
                                     <Text style={{ color: theme.text, opacity: 0.6 }}>
-                                        📊 Graph will display real-time {device.type.toLowerCase()} data
+                                        {/* 📊 Graph will display real-time {device.type.toLowerCase()} data */}
                                     </Text>
                                 </View>
                             </View>
@@ -100,10 +181,10 @@ export default function DevicePage() {
                                     style={{ backgroundColor: theme.uiBackground }}
                                 >
                                     <Text className="text-sm font-medium mb-1" style={{ color: theme.text }}>
-                                        Current Value
+                                        Device Type
                                     </Text>
                                     <Text className="text-2xl font-bold" style={{ color: theme.title }}>
-                                        --°C
+                                        {deviceData.deviceType}
                                     </Text>
                                 </View>
                                 <View
@@ -111,10 +192,10 @@ export default function DevicePage() {
                                     style={{ backgroundColor: theme.uiBackground }}
                                 >
                                     <Text className="text-sm font-medium mb-1" style={{ color: theme.text }}>
-                                        Average (24h)
+                                        Status
                                     </Text>
                                     <Text className="text-2xl font-bold" style={{ color: theme.title }}>
-                                        --°C
+                                        {deviceData.status}
                                     </Text>
                                 </View>
                             </View>
@@ -140,6 +221,31 @@ export default function DevicePage() {
                                 </View>
                             </View>
 
+                            {/* Device Settings */}
+                            {deviceData.settings && Object.keys(deviceData.settings).length > 0 && (
+                                <View
+                                    className="rounded-lg p-4 border"
+                                    style={{
+                                        backgroundColor: theme.uiBackground,
+                                        borderColor: theme.text + '20'
+                                    }}
+                                >
+                                    <Text className="text-sm font-medium mb-2" style={{ color: theme.title }}>
+                                        Device Settings
+                                    </Text>
+                                    {Object.entries(deviceData.settings).map(([key, value]) => (
+                                        <View key={key} className="flex-row justify-between items-center py-1">
+                                            <Text style={{ color: theme.text }} className="capitalize">
+                                                {key.replace(/([A-Z])/g, ' $1').trim()}:
+                                            </Text>
+                                            <Text style={{ color: theme.text, fontWeight: '500' }}>
+                                                {String(value)}
+                                            </Text>
+                                        </View>
+                                    ))}
+                                </View>
+                            )}
+
                             {/* Backend Connection Status */}
                             <View
                                 className="rounded-lg p-4 border"
@@ -152,9 +258,11 @@ export default function DevicePage() {
                                     Backend Connection
                                 </Text>
                                 <View className="flex-row items-center">
-                                    <View className="w-2 h-2 rounded-full bg-yellow-500 mr-2" />
+                                    <View className={`w-2 h-2 rounded-full mr-2 ${
+                                        deviceData ? 'bg-green-500' : 'bg-red-500'
+                                    }`} />
                                     <Text style={{ color: theme.text }}>
-                                        Waiting for backend connection...
+                                        {deviceData ? 'Connected' : 'Disconnected'}
                                     </Text>
                                 </View>
                             </View>

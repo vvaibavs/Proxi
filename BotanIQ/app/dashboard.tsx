@@ -7,7 +7,7 @@ import { useAuth } from "../contexts/AuthContext";
 
 export default function Dashboard() {
     const colorScheme = useColorScheme();
-    const theme = Colors[colorScheme ?? "light"];
+    const theme = Colors["light"];
     const { user, logout, token } = useAuth();
     const [devices, setDevices] = useState([]);
     const [loading, setLoading] = useState(false);

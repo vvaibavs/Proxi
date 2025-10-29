@@ -159,6 +159,31 @@ app.get('/api/devices', authenticateToken, async (req, res) => {
   }
 });
 
+// Get specific device by ID route
+app.get('/api/devices/:deviceId', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const { deviceId } = req.params;
+    const device = user.devices.find(d => d.deviceId === deviceId);
+
+    if (!device) {
+      return res.status(404).json({ error: 'Device not found' });
+    }
+
+    res.json({
+      message: 'Device retrieved successfully',
+      device: device
+    });
+  } catch (error) {
+    console.error('Get device error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Update device status route
 app.put('/api/devices/:deviceId/status', [
   authenticateToken,

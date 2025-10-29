@@ -7,7 +7,7 @@ import { useAuth } from "../contexts/AuthContext";
 
 export default function SignUp() {
     const colorScheme = useColorScheme()
-    const theme = Colors[colorScheme ?? "light"]
+    const theme = Colors["light"]
     const { signup, loading } = useAuth()
 
     const [username, setUsername] = useState("")
@@ -41,11 +41,10 @@ export default function SignUp() {
         setIsLoading(false);
 
         if (result.success) {
-            Alert.alert("Success", "Account created successfully!", [
-                { text: "OK", onPress: () => router.replace("/dashboard") }
-            ]);
+            router.replace("/dashboard");
         } else {
             Alert.alert("Signup Failed", result.error || "An error occurred");
+            router.replace("/signup");
         }
     }
 

@@ -14,10 +14,10 @@ export const Colors = {
     light: {
         text: '#625f72',
         title: '#201e2b',
-        background: '#e0dfe8',
+        background: '#F0FFFF',
         navBackground: '#e8e7ef',
         iconColour: '#686477',
         iconColourFocused: '#201e2b',
-        uiBackground: '#d6d5e1',
+        uiBackground: '#90e0ef',
     }
 }
