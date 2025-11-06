@@ -160,63 +160,42 @@ export default function Dashboard() {
                                 </Text>
                             </View>
                         ) : (
-                            <View className="space-y-3">
+                            <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" }}>
                                 {devices.map((device, index) => (
                                     <Link
-                                        key={device.deviceId || index}
-                                        href={`/device/${device.deviceId}`}
-                                        asChild
+                                    key={device.deviceId || index}
+                                    href={`/device/${device.deviceId}`}
+                                    asChild
                                     >
-                                        <TouchableOpacity
-                                            className="bg-white rounded-lg p-4 shadow-sm border"
+                                    <TouchableOpacity
+                                        style={{
+                                        backgroundColor: theme.uiBackground,
+                                        borderColor: theme.text + "20",
+                                        borderWidth: 1,
+                                        borderRadius: 10,
+                                        padding: 16,
+                                        marginBottom: 12,
+                                        width: "48%", // ✅ makes two per row
+                                        }}
+                                    >
+                                        <View style={{ justifyContent: "space-between" }}>
+                                        <Text
                                             style={{
-                                                backgroundColor: theme.uiBackground,
-                                                borderColor: theme.text + '20'
+                                            color: theme.title,
+                                            fontWeight: "600",
+                                            fontSize: 16,
+                                            marginBottom: 4,
                                             }}
                                         >
-                                            <View className="flex-row justify-between items-center">
-                                                <View className="flex-1">
-                                                    <Text
-                                                        className="text-lg font-semibold mb-1"
-                                                        style={{ color: theme.title }}
-                                                    >
-                                                        {device.deviceName}
-                                                    </Text>
-                                                    <Text
-                                                        className="text-sm"
-                                                        style={{ color: theme.text }}
-                                                    >
-                                                        {device.deviceType} • {device.location}
-                                                    </Text>
-                                                </View>
-                                                <View className="items-end">
-                                                    <View
-                                                        className={`px-3 py-1 rounded-full ${
-                                                            device.status === 'Online'
-                                                                ? 'bg-green-100'
-                                                                : device.status === 'Offline'
-                                                                ? 'bg-red-100'
-                                                                : 'bg-yellow-100'
-                                                        }`}
-                                                    >
-                                                        <Text
-                                                            className={`text-xs font-medium ${
-                                                                device.status === 'Online'
-                                                                    ? 'text-green-800'
-                                                                    : device.status === 'Offline'
-                                                                    ? 'text-red-800'
-                                                                    : 'text-yellow-800'
-                                                            }`}
-                                                        >
-                                                            {device.status}
-                                                        </Text>
-                                                    </View>
-                                                </View>
-                                            </View>
-                                        </TouchableOpacity>
+                                            {device.deviceName}
+                                        </Text>
+                                        
+                                        </View>
+                                    </TouchableOpacity>
                                     </Link>
                                 ))}
                             </View>
+
                         )}
 
 
