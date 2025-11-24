@@ -80,7 +80,7 @@ export default function Dashboard() {
                     "Authorization": `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                    deviceId: "TEMP001",
+                    deviceId: "random",
                     deviceName: "Temperature Sensor 1",
                     deviceType: "Temperature",
                     location: "Greenhouse A"
@@ -189,7 +189,7 @@ export default function Dashboard() {
                                         >
                                             {device.deviceName}
                                         </Text>
-                                        
+
                                         </View>
                                     </TouchableOpacity>
                                     </Link>

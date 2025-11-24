@@ -10,28 +10,14 @@ const deviceSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  deviceType: {
-    type: String,
-    enum: ['Temperature', 'Humidity', 'Irrigation', 'Lighting', 'Soil', 'Other'],
-    default: 'Other'
-  },
   status: {
     type: String,
     enum: ['Online', 'Offline', 'Maintenance'],
     default: 'Offline'
   },
-  lastSeen: {
-    type: Date,
-    default: Date.now
-  },
-  location: {
-    type: String,
-    default: 'Unknown'
-  },
-  settings: {
-    type: Map,
-    of: mongoose.Schema.Types.Mixed,
-    default: {}
+  screenTime: {
+    type: Number,
+    default: 645
   }
 }, {
   timestamps: true

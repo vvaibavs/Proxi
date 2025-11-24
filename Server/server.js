@@ -184,6 +184,42 @@ app.get('/api/devices/:deviceId', authenticateToken, async (req, res) => {
   }
 });
 
+app.put("/api/devices/:deviceId/putTime", authenticateToken, async (req, res) => {
+    try {
+        const { deviceId } = req.params;
+
+        const { screenTime } = req.body;
+        const user = await User.findById(req.user.userId);
+        const device = user.devices.find(d => d.deviceId === deviceId);
+
+        device.screenTime = screenTime
+
+        await user.save()
+        res.json({
+            message: "device updated",
+            device: device
+        })
+    } catch (err) {
+        console.error("error:" + err)
+    }
+})
+
+app.get('/api/devices/:deviceId/getTime', authenticateToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId);
+
+        const { deviceId } = req.params;
+        const device = user.devices.find(d => d.deviceId === deviceId);
+        console.log(device)
+        res.json({
+            message: 'time retrieved successfully',
+            time: device.screenTime
+        })
+    } catch (error) {
+        console.error(error);
+    }
+})
+
 // Update device status route
 app.put('/api/devices/:deviceId/status', [
   authenticateToken,
