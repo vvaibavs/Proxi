@@ -24,7 +24,9 @@ export default function DevicePage() {
     const [deviceData, setDeviceData] = useState<Device | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [time, setTime] = useState()
+    const [time, setTime] = useState(0)
+    const [apiData, setApiData] = useState()
+
     const deviceID = id as string;
     const API_BASE_URL = 'http://localhost:3000/api';
 
@@ -70,27 +72,55 @@ export default function DevicePage() {
     }
 
     const screenTime = async () => {
+        try {
+            // 1. Fetch from your object detection API
+            const detectionRes = await fetch("http://127.0.0.1:5000/last-detection");
+            const detectionData = await detectionRes.json();
 
-        // const response = await fetch("http://127.0.0.1:5000/last-detection")
-        // const data = await response.json()
-        // Console.log()
-        // return data
-        const id = '6923f03a64118c069446358e'
-        const newTime = 567
-        const response1 = await fetch(`${API_BASE_URL}/devices/${deviceID}/putTime`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-                screenTime: newTime
-            }),
-        })
+            // 2. Only run if object detected
+            if (!detectionData.objects[0]) return;
+            // console.log(apiData)
+            // if(detectionData.object[0] == apiData) {
+            //     console.log('same object')
+            //     return;
+            // }
+            const label = detectionData.objects[0].label;
 
-        const data1 = await response1.json();
+            if (label === "laptop" || label === "tv") {
 
-    }
+                // 3. GET the latest time before updating
+                const timeRes = await fetch(`${API_BASE_URL}/devices/${deviceID}/getTime`, {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                const timeData = await timeRes.json();
+
+                const updatedTime = timeData.time + 3;
+                // setApiData(detectionData.object[0])
+                // console.log(apiData)
+
+                // 4. Update
+                const updateRes = await fetch(`${API_BASE_URL}/devices/${deviceID}/putTime`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        screenTime: updatedTime
+                    })
+                });
+
+                const updated = await updateRes.json();
+                console.log("Updated time:", updated.device.screenTime);
+
+                // 5. update local UI state
+                setTime(updated.device.screenTime);
+            }
+        } catch (err) {
+            console.error("Screen time update error:", err);
+        }
+    };
+
 
     useEffect(() => {
         if (deviceID && token) {
@@ -99,15 +129,19 @@ export default function DevicePage() {
     }, [deviceID, token]);
 
     useEffect(() => {
-        if (deviceData && token) {
-            screenTime();
+        if (deviceID && token) {
+            const interval = setInterval(() => {
+                screenTime();
+            }, 3000);
+
+            return () => clearInterval(interval);
         }
-    }, [deviceData, token]);
-    useEffect(() => {
-        if (deviceData && token) {
-            getTime();
-        }
-    }, [deviceData, token]);
+    }, [deviceID, token]);
+    // useEffect(() => {
+    //     if (deviceData && token) {
+    //         getTime();
+    //     }
+    // }, [deviceData, token]);
 
 
     if (loading) {
@@ -195,14 +229,14 @@ export default function DevicePage() {
                                 }}
                             >
                                 <Text className="text-lg font-semibold mb-3" style={{ color: theme.title }}>
-                                    Real-time Data
+                                    Screen Time Today
                                 </Text>
                                 <View
                                     className="h-48 rounded-lg flex items-center justify-center"
                                     style={{ backgroundColor: theme.background }}
                                 >
-                                    <Text style={{ color: theme.text, opacity: 0.6 }}>
-                                        {/* 📊 Graph will display real-time {device.type.toLowerCase()} data */}
+                                    <Text style={{ color: theme.text }} className="text-xl">
+                                        {time}
                                     </Text>
                                 </View>
                             </View>
