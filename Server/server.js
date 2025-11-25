@@ -258,6 +258,45 @@ app.put('/api/devices/:deviceId/status', [
   }
 });
 
+// get max time
+app.get('/api/devices/:deviceId/getMaxTime', authenticateToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId);
+
+        const { deviceId } = req.params;
+        const device = user.devices.find(d => d.deviceId === deviceId);
+        console.log(device)
+        res.json({
+            message: 'time retrieved successfully',
+            maxTime: device.maxTime
+        })
+    } catch(err) {
+        console.log(err)
+    }
+})
+
+// set max time
+app.put('/api/devices/:deviceId/setMaxTime', authenticateToken, async (req, res) => {
+    try {
+        const {deviceId} = req.params
+        const { maxTime } = req.body
+
+        const user = await User.findById(req.user.userId);
+        const device = user.devices.find(d => d.deviceId === deviceId);
+
+        device.maxTime = maxTime
+        await user.save()
+
+        res.json({
+            message: "device updated",
+            device: device
+        })
+
+    } catch(err) {
+        console.log(err)
+    }
+})
+
 // Remove device route
 app.delete('/api/devices/:deviceId', authenticateToken, async (req, res) => {
   try {

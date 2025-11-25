@@ -17,7 +17,11 @@ const deviceSchema = new mongoose.Schema({
   },
   screenTime: {
     type: Number,
-    default: 645
+    default: 0
+  },
+  maxTime: {
+    type: Number,
+    default: 9999999
   }
 }, {
   timestamps: true

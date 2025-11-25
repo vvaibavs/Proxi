@@ -1,9 +1,13 @@
 import { useLocalSearchParams } from "expo-router";
-import { ScrollView, Text, useColorScheme, View, ActivityIndicator, Alert } from "react-native";
+import { ScrollView, Text, useColorScheme, View, ActivityIndicator, Alert, Button } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "../../constants/colors";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
+import { Modal, Pressable } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { TextInput } from "react-native";
+
 
 interface Device {
     deviceId: string;
@@ -17,7 +21,7 @@ interface Device {
 
 export default function DevicePage() {
     const colorScheme = useColorScheme();
-    const theme = Colors[colorScheme ?? "light"];
+    const theme = Colors["light"];
     const { id } = useLocalSearchParams();
     const { token } = useAuth();
 
@@ -26,6 +30,10 @@ export default function DevicePage() {
     const [error, setError] = useState<string | null>(null);
     const [time, setTime] = useState(0)
     const [apiData, setApiData] = useState()
+    const [maxTime, setMaxTime] = useState(999999999)
+    const[exceeded, setExceeded] = useState(false)
+    const [settingsVisible, setSettingsVisible] = useState(false);
+    const [settingsText, setSettingsText] = useState("")
 
     const deviceID = id as string;
     const API_BASE_URL = 'http://localhost:3000/api';
@@ -56,6 +64,8 @@ export default function DevicePage() {
         } finally {
             setLoading(false);
         }
+
+        await getMaxTime()
     };
 
     const getTime = async () => {
@@ -94,7 +104,7 @@ export default function DevicePage() {
                 });
                 const timeData = await timeRes.json();
 
-                const updatedTime = timeData.time + 3;
+                const updatedTime = timeData.time + 1;
                 // setApiData(detectionData.object[0])
                 // console.log(apiData)
 
@@ -121,28 +131,69 @@ export default function DevicePage() {
         }
     };
 
+    const submitMaxTime = async () => {
+        const updateRes = await fetch(`${API_BASE_URL}/devices/${deviceID}/setMaxTime`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                maxTime: parseInt(settingsText)
+            })
+        })
+    }
+
+    const getMaxTime = async () => {
+        const response = await fetch(`${API_BASE_URL}/devices/${deviceID}/getMaxTime`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        const data = await response.json()
+        setMaxTime(data.maxTime)
+    }
+
 
     useEffect(() => {
         if (deviceID && token) {
             getDeviceData();
         }
-    }, [deviceID, token]);
+    }, [deviceID, token, maxTime]);
+
 
     useEffect(() => {
         if (deviceID && token) {
             const interval = setInterval(() => {
                 screenTime();
-            }, 3000);
+            }, 1000);
 
             return () => clearInterval(interval);
         }
     }, [deviceID, token]);
-    // useEffect(() => {
-    //     if (deviceData && token) {
-    //         getTime();
-    //     }
-    // }, [deviceData, token]);
+    useEffect(() => {
+        if (deviceData && token) {
+            getTime();
+        }
+    }, [deviceData, token]);
 
+    useEffect(() => {
+        if(time>maxTime) {
+            setExceeded(true)
+        }
+    }, [time, maxTime])
+    useEffect(() => {
+        if(exceeded) {
+            alert('the time has exceeded')
+        }
+    }, [exceeded])
+
+
+
+    const convertSecondsToMinutes = (totalSeconds: any) => {
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${minutes} min ${seconds} sec`;
+    };
 
     if (loading) {
         return (
@@ -189,40 +240,23 @@ export default function DevicePage() {
                         {/* Header */}
                         <View className="mb-6">
                             <Text className="text-3xl font-bold mb-2" style={{ color: theme.title }}>
-                                {deviceData.deviceName}
+                                Demo Device
                             </Text>
-                            <Text className="text-lg" style={{ color: theme.text }}>
-                                {deviceData.deviceType} • Device ID: {deviceData.deviceId}
-                            </Text>
-                            <View className="flex-row items-center mt-2">
-                                <View
-                                    className={`w-3 h-3 rounded-full mr-2 ${
-                                        deviceData.status === 'Online' ? 'bg-green-500' :
-                                        deviceData.status === 'Offline' ? 'bg-red-500' : 'bg-yellow-500'
-                                    }`}
-                                />
-                                <Text style={{ color: theme.text }}>
-                                    {deviceData.status}
-                                </Text>
-                            </View>
-                            <Text className="text-sm mt-1" style={{ color: theme.text, opacity: 0.7 }}>
-                                Last seen: {new Date(deviceData.lastSeen).toLocaleString()}
-                            </Text>
-                            <Text className="text-sm" style={{ color: theme.text, opacity: 0.7 }}>
-                                Location: {deviceData.location}
-                                {time}
-                            </Text>
+                            <Pressable onPress={() => setSettingsVisible(true)}>
+                                <Ionicons name="settings-outline" size={28} color={theme.title} />
+                            </Pressable>
+
                         </View>
 
                         {/* Data Visualization Section */}
                         <View className="space-y-6">
                             <Text className="text-xl font-semibold mb-4" style={{ color: theme.title }}>
-                                Data Visualization
+                                Data
                             </Text>
-
+                            {maxTime}
                             {/* Real-time Data Graph */}
                             <View
-                                className="rounded-lg p-6 border-2 border-dashed"
+                                className="rounded-lg p-6 border-2"
                                 style={{
                                     backgroundColor: theme.uiBackground,
                                     borderColor: theme.text + '40'
@@ -235,15 +269,15 @@ export default function DevicePage() {
                                     className="h-48 rounded-lg flex items-center justify-center"
                                     style={{ backgroundColor: theme.background }}
                                 >
-                                    <Text style={{ color: theme.text }} className="text-xl">
-                                        {time}
+                                    <Text style={{ color: theme.text }} className="text-3xl">
+                                        {convertSecondsToMinutes(time)}
                                     </Text>
                                 </View>
                             </View>
 
                             {/* Historical Data Graph */}
                             <View
-                                className="rounded-lg p-6 border-2 border-dashed"
+                                className="rounded-lg p-6 border-2"
                                 style={{
                                     backgroundColor: theme.uiBackground,
                                     borderColor: theme.text + '40'
@@ -261,82 +295,64 @@ export default function DevicePage() {
                                     </Text>
                                 </View>
                             </View>
-
-                            {/* Data Summary Cards */}
-                            {/* <View className="flex-row space-x-4">
-                                <View
-                                    className="flex-1 rounded-lg p-4"
-                                    style={{ backgroundColor: theme.uiBackground }}
-                                >
-                                    <Text className="text-sm font-medium mb-1" style={{ color: theme.text }}>
-                                        Device Type
-                                    </Text>
-                                    <Text className="text-2xl font-bold" style={{ color: theme.title }}>
-                                        {deviceData.deviceType}
-                                    </Text>
-                                </View>
-                                <View
-                                    className="flex-1 rounded-lg p-4"
-                                    style={{ backgroundColor: theme.uiBackground }}
-                                >
-                                    <Text className="text-sm font-medium mb-1" style={{ color: theme.text }}>
-                                        Status
-                                    </Text>
-                                    <Text className="text-2xl font-bold" style={{ color: theme.title }}>
-                                        {deviceData.status}
-                                    </Text>
-                                </View>
-                            </View> */}
-
-                            {/* Additional Metrics */}
-                            {/* <View
-                                className="rounded-lg p-6 border-2 border-dashed"
+                        </View>
+                    </View>
+                    <Modal
+                        visible={settingsVisible}
+                        transparent={true}
+                        animationType="slide"
+                        onRequestClose={() => setSettingsVisible(false)}
+                    >
+                        <View
+                            style={{
+                                flex: 1,
+                                backgroundColor: "rgba(0,0,0,0.3)",
+                                justifyContent: "center",
+                                alignItems: "center"
+                            }}
+                        >
+                            <View
                                 style={{
-                                    backgroundColor: theme.uiBackground,
-                                    borderColor: theme.text + '40'
+                                    width: "80%",
+                                    padding: 20,
+                                    borderRadius: 12,
+                                    backgroundColor: theme.uiBackground
                                 }}
                             >
-                                <Text className="text-lg font-semibold mb-3" style={{ color: theme.title }}>
-                                    Additional Metrics
-                                </Text>
-                                <View
-                                    className="h-32 rounded-lg flex items-center justify-center"
-                                    style={{ backgroundColor: theme.background }}
+                                <Text
+                                    className="text-xl font-semibold mb-4"
+                                    style={{ color: theme.title }}
                                 >
-                                    <Text style={{ color: theme.text, opacity: 0.6 }}>
-                                        📋 Additional sensor data and analytics
-                                    </Text>
-                                </View>
-                            </View> */}
+                                    Settings
+                                </Text>
 
-                            {/* Device Settings */}
-                            {/* {deviceData.settings && Object.keys(deviceData.settings).length > 0 && (
-                                <View
-                                    className="rounded-lg p-4 border"
+                                {/* Whatever you want to put inside the modal */}
+                                <Text>
+                                    Set Max Time
+                                </Text>
+                                <TextInput
+                                    value={settingsText}
+                                    onChangeText={setSettingsText}>
+                                </TextInput>
+                                <Pressable
+                                    onPress={submitMaxTime}
+                                >
+                                    submit
+                                </Pressable>
+
+                                <Pressable
+                                    onPress={() => setSettingsVisible(false)}
                                     style={{
-                                        backgroundColor: theme.uiBackground,
-                                        borderColor: theme.text + '20'
+                                        marginTop: 10,
+                                        padding: 10,
+                                        alignSelf: "flex-end"
                                     }}
                                 >
-                                    <Text className="text-sm font-medium mb-2" style={{ color: theme.title }}>
-                                        Device Settings
-                                    </Text>
-                                    {Object.entries(deviceData.settings).map(([key, value]) => (
-                                        <View key={key} className="flex-row justify-between items-center py-1">
-                                            <Text style={{ color: theme.text }} className="capitalize">
-                                                {key.replace(/([A-Z])/g, ' $1').trim()}:
-                                            </Text>
-                                            <Text style={{ color: theme.text, fontWeight: '500' }}>
-                                                {String(value)}
-                                            </Text>
-                                        </View>
-                                    ))}
-                                </View>
-                            )} */}
-
-                            {/* Backend Connection Status */}
-                    </View>
-                    </View>
+                                    <Text style={{ color: Colors.primary, fontSize: 16 }}>Close</Text>
+                                </Pressable>
+                            </View>
+                        </View>
+                    </Modal>
                 </ScrollView>
             </SafeAreaView>
         </SafeAreaProvider>

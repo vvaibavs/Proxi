@@ -19,6 +19,7 @@ export default function RootLayout() {
           <Stack.Screen name="signup"/>
           <Stack.Screen name="dashboard"/>
           <Stack.Screen name="device/[id]"/>
+          <Stack.Screen name="notifications"/>
       </Stack>
     </AuthProvider>
   )
