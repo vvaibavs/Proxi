@@ -274,7 +274,57 @@ app.get('/api/devices/:deviceId/getMaxTime', authenticateToken, async (req, res)
         console.log(err)
     }
 })
+//add notifications
+// app.put('/api/setNotifications', authenticateToken, async (req, res) => {
+//     try {
+//         const { notification } = req.body
 
+//         const user = await User.findById(req.user.userId);
+//         if(!user.notifs) {
+//             user.notifs = []
+//         }
+//         user.notifs.push(notification)
+
+
+//         await user.save();
+
+//         res.json({
+//             message: "notification added successfully"
+//         })
+//     } catch (err) {
+//         console.log(err)
+//     }
+// })
+app.put('/api/setNotifications', authenticateToken, async (req, res) => {
+    try {
+        const { notification } = req.body;
+
+        await User.findByIdAndUpdate(
+            req.user.userId,
+            { $push: { notifs: notification } },
+            { new: true, upsert: true }
+        );
+
+        res.json({ message: "notification added successfully" });
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: "Failed to add notification" });
+    }
+});
+
+// get notifications
+app.get('/api/getNotifications', authenticateToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId);
+        res.json({
+            message: 'Devices retrieved successfully',
+            notifications: user.notifs
+        });
+    } catch (err) {
+        console.log(err)
+    }
+})
 // set max time
 app.put('/api/devices/:deviceId/setMaxTime', authenticateToken, async (req, res) => {
     try {

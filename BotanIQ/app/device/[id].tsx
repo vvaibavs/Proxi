@@ -153,6 +153,26 @@ export default function DevicePage() {
         setMaxTime(data.maxTime)
     }
 
+    const addNotification = async (notif: String) => {
+        try {
+            const updateRes = await fetch(`${API_BASE_URL}/setNotifications`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    notification: notif
+                })
+            })
+
+            const data = await updateRes.json()
+            console.log(data)
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
 
     useEffect(() => {
         if (deviceID && token) {
@@ -183,8 +203,8 @@ export default function DevicePage() {
     }, [time, maxTime])
     useEffect(() => {
         if(exceeded) {
-            alert('the time has exceeded')
-        }
+            alert('the time has exceeded')        }
+            addNotification("time has been exceeded")
     }, [exceeded])
 
 

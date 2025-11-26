@@ -65,8 +65,12 @@ const userSchema = new mongoose.Schema({
       push: {
         type: Boolean,
         default: true
-      }
+      },
     }
+  },
+  notifs: {
+    type: [String],
+    default: []
   }
 }, {
   timestamps: true, // Adds createdAt and updatedAt fields
