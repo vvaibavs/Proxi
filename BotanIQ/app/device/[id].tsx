@@ -34,6 +34,7 @@ export default function DevicePage() {
     const[exceeded, setExceeded] = useState(false)
     const [settingsVisible, setSettingsVisible] = useState(false);
     const [settingsText, setSettingsText] = useState("")
+    const [tooClose, setTooClose] = useState(false)
 
     const deviceID = id as string;
     const API_BASE_URL = 'http://localhost:3000/api';
@@ -88,13 +89,14 @@ export default function DevicePage() {
             const detectionData = await detectionRes.json();
 
             // 2. Only run if object detected
-            if (!detectionData.objects[0]) return;
+            if (!detectionData.screenType) return;
+            setTooClose(detectionData.tooClose)
             // console.log(apiData)
             // if(detectionData.object[0] == apiData) {
             //     console.log('same object')
             //     return;
             // }
-            const label = detectionData.objects[0].label;
+            const label = detectionData.screenType;
 
             if (label === "laptop" || label === "tv") {
 
@@ -207,6 +209,12 @@ export default function DevicePage() {
             addNotification("time has been exceeded")
     }, [exceeded])
 
+    useEffect(() => {
+        if(tooClose) {
+            alert('too close')
+        }
+    }, [tooClose])
+
 
 
     const convertSecondsToMinutes = (totalSeconds: any) => {
@@ -253,128 +261,169 @@ export default function DevicePage() {
     // })
 
     return (
-        <SafeAreaProvider style={{ backgroundColor: theme.background }}>
-            <SafeAreaView style={{ flex: 1 }}>
-                <ScrollView style={{ flex: 1 }}>
-                    <View className="p-5">
-                        {/* Header */}
-                        <View className="mb-6">
-                            <Text className="text-3xl font-bold mb-2" style={{ color: theme.title }}>
-                                Demo Device
-                            </Text>
-                            <Pressable onPress={() => setSettingsVisible(true)}>
-                                <Ionicons name="settings-outline" size={28} color={theme.title} />
+            <SafeAreaProvider style={{ backgroundColor: theme.background }}>
+                <SafeAreaView style={{ flex: 1 }}>
+                    <ScrollView style={{ padding: 20 }}>
+
+                        {/* HEADER */}
+                        <View className="flex-row justify-between items-center mb-6">
+                            <View>
+                                <Text className="text-4xl font-extrabold" style={{ color: theme.title }}>
+                                    Demo Device
+                                </Text>
+                                <Text className="text-base opacity-60 mt-1" style={{ color: theme.text }}>
+                                    Monitoring & Insights
+                                </Text>
+                            </View>
+
+                            <Pressable
+                                onPress={() => setSettingsVisible(true)}
+                                style={{
+                                    padding: 10,
+                                    borderRadius: 50,
+                                    backgroundColor: theme.uiBackground,
+                                    shadowColor: "#000",
+                                    shadowOpacity: 0.15,
+                                    shadowRadius: 4,
+                                }}
+                            >
+                                <Ionicons name="settings-outline" size={24} color={theme.title} />
                             </Pressable>
-
                         </View>
 
-                        {/* Data Visualization Section */}
-                        <View className="space-y-6">
-                            <Text className="text-xl font-semibold mb-4" style={{ color: theme.title }}>
-                                Data
+                        {/* SCREEN TIME CARD */}
+                        <View
+                            style={{
+                                backgroundColor: theme.uiBackground,
+                                padding: 20,
+                                borderRadius: 20,
+                                shadowColor: "#000",
+                                shadowOpacity: 0.07,
+                                shadowRadius: 10,
+                                marginBottom: 20,
+                            }}
+                        >
+                            <Text className="text-xl font-semibold mb-3" style={{ color: theme.title }}>
+                                Screen Time Today
                             </Text>
-                            {maxTime}
-                            {/* Real-time Data Graph */}
+
                             <View
-                                className="rounded-lg p-6 border-2"
                                 style={{
-                                    backgroundColor: theme.uiBackground,
-                                    borderColor: theme.text + '40'
+                                    backgroundColor: theme.background,
+                                    height: 140,
+                                    borderRadius: 16,
+                                    justifyContent: "center",
+                                    alignItems: "center",
                                 }}
                             >
-                                <Text className="text-lg font-semibold mb-3" style={{ color: theme.title }}>
-                                    Screen Time Today
+                                <Text className="text-4xl font-bold" style={{ color: theme.text }}>
+                                    {convertSecondsToMinutes(time)}
                                 </Text>
-                                <View
-                                    className="h-48 rounded-lg flex items-center justify-center"
-                                    style={{ backgroundColor: theme.background }}
-                                >
-                                    <Text style={{ color: theme.text }} className="text-3xl">
-                                        {convertSecondsToMinutes(time)}
-                                    </Text>
-                                </View>
                             </View>
 
-                            {/* Historical Data Graph */}
+                            <Text style={{ color: theme.text, opacity: 0.6, marginTop: 10 }}>
+                                Max Allowed: {convertSecondsToMinutes(maxTime)}
+                            </Text>
+                        </View>
+
+                        {/* HISTORICAL CARD */}
+                        <View
+                            style={{
+                                backgroundColor: theme.uiBackground,
+                                padding: 20,
+                                borderRadius: 20,
+                                shadowColor: "#000",
+                                shadowOpacity: 0.07,
+                                shadowRadius: 10,
+                            }}
+                        >
+                            <Text className="text-xl font-semibold mb-3" style={{ color: theme.title }}>
+                                Historical Trends
+                            </Text>
+
                             <View
-                                className="rounded-lg p-6 border-2"
                                 style={{
-                                    backgroundColor: theme.uiBackground,
-                                    borderColor: theme.text + '40'
+                                    backgroundColor: theme.background,
+                                    height: 160,
+                                    borderRadius: 16,
+                                    justifyContent: "center",
+                                    alignItems: "center",
                                 }}
                             >
-                                <Text className="text-lg font-semibold mb-3" style={{ color: theme.title }}>
-                                    Historical Trends
+                                <Text style={{ color: theme.text, opacity: 0.5 }}>
+                                    Graph coming soon...
                                 </Text>
-                                <View
-                                    className="h-48 rounded-lg flex items-center justify-center"
-                                    style={{ backgroundColor: theme.background }}
-                                >
-                                    <Text style={{ color: theme.text, opacity: 0.6 }}>
-                                        📈 Historical data chart will appear here
-                                    </Text>
-                                </View>
                             </View>
                         </View>
-                    </View>
-                    <Modal
-                        visible={settingsVisible}
-                        transparent={true}
-                        animationType="slide"
-                        onRequestClose={() => setSettingsVisible(false)}
-                    >
+
+                    </ScrollView>
+
+                    {/* SETTINGS MODAL */}
+                    <Modal visible={settingsVisible} transparent animationType="fade">
                         <View
                             style={{
                                 flex: 1,
-                                backgroundColor: "rgba(0,0,0,0.3)",
+                                backgroundColor: "rgba(0,0,0,0.4)",
                                 justifyContent: "center",
-                                alignItems: "center"
+                                alignItems: "center",
                             }}
                         >
                             <View
                                 style={{
-                                    width: "80%",
-                                    padding: 20,
-                                    borderRadius: 12,
-                                    backgroundColor: theme.uiBackground
+                                    width: "85%",
+                                    padding: 25,
+                                    backgroundColor: theme.uiBackground,
+                                    borderRadius: 20,
                                 }}
                             >
-                                <Text
-                                    className="text-xl font-semibold mb-4"
-                                    style={{ color: theme.title }}
-                                >
+                                <Text className="text-2xl font-bold mb-4" style={{ color: theme.title }}>
                                     Settings
                                 </Text>
 
-                                {/* Whatever you want to put inside the modal */}
-                                <Text>
-                                    Set Max Time
+                                <Text className="mb-2" style={{ color: theme.text }}>
+                                    Set Max Screen Time (seconds)
                                 </Text>
+
                                 <TextInput
                                     value={settingsText}
-                                    onChangeText={setSettingsText}>
-                                </TextInput>
-                                <Pressable
-                                    onPress={submitMaxTime}
-                                >
-                                    submit
-                                </Pressable>
+                                    onChangeText={setSettingsText}
+                                    keyboardType="numeric"
+                                    placeholder="Enter seconds..."
+                                    style={{
+                                        backgroundColor: theme.background,
+                                        padding: 12,
+                                        borderRadius: 12,
+                                        marginBottom: 20,
+                                        borderWidth: 1,
+                                        borderColor: "#ddd",
+                                        color: theme.text,
+                                    }}
+                                />
 
                                 <Pressable
-                                    onPress={() => setSettingsVisible(false)}
+                                    onPress={submitMaxTime}
                                     style={{
-                                        marginTop: 10,
-                                        padding: 10,
-                                        alignSelf: "flex-end"
+                                        backgroundColor: Colors.primary,
+                                        padding: 14,
+                                        borderRadius: 12,
+                                        alignItems: "center",
+                                        marginBottom: 10
                                     }}
                                 >
-                                    <Text style={{ color: Colors.primary, fontSize: 16 }}>Close</Text>
+                                    <Text style={{ color: "#fff", fontSize: 16, fontWeight: "600" }}>
+                                        Save
+                                    </Text>
+                                </Pressable>
+
+                                <Pressable onPress={() => setSettingsVisible(false)}>
+                                    <Text style={{ color: Colors.primary, fontSize: 16, textAlign: "center" }}>
+                                        Close
+                                    </Text>
                                 </Pressable>
                             </View>
                         </View>
                     </Modal>
-                </ScrollView>
-            </SafeAreaView>
-        </SafeAreaProvider>
+                </SafeAreaView>
+            </SafeAreaProvider>
     );
 }
