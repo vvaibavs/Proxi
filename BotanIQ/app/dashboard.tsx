@@ -105,103 +105,104 @@ export default function Dashboard() {
     };
 
     return (
-        <SafeAreaProvider style={{ backgroundColor: theme.background }}>
-            <SafeAreaView>
-                <ScrollView>
-                    <View className="p-5">
-                        <View className="flex-row justify-between items-center mb-6">
-                            <View>
-                                <Text className="text-3xl font-bold" style={{ color: theme.title }}>
-                                    Dashboard
-                                </Text>
-                                {user && (
-                                    <Text className="text-lg" style={{ color: theme.text }}>
-                                        Welcome, {user.username}!
-                                    </Text>
-                                )}
-                            </View>
-                            <TouchableOpacity
-                                onPress={handleLogout}
-                                className="bg-red-500 px-4 py-2 rounded-md"
-                            >
-                                <Text className="text-white font-semibold">Logout</Text>
-                            </TouchableOpacity>
-                        </View>
+    <SafeAreaProvider style={{ backgroundColor: theme.background }}>
+      <SafeAreaView>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View className="p-6">
+            {/* Header */}
+            <View className="flex-row justify-between items-center mb-8">
+              <View>
+                <Text className="text-4xl font-bold tracking-tight" style={{ color: theme.title }}>
+                  Dashboard
+                </Text>
+                {user && (
+                  <Text className="text-lg mt-1 opacity-80" style={{ color: theme.text }}>
+                    Welcome back, <Text className="font-semibold">{user.username}</Text>
+                  </Text>
+                )}
+              </View>
 
-                        <View className="flex-row justify-between items-center mb-4">
-                            <Text className="text-xl font-semibold" style={{ color: theme.title }}>
-                                Connected Devices
-                            </Text>
-                            <TouchableOpacity
-                                onPress={addDevice}
-                                className="bg-blue-500 px-4 py-2 rounded-md"
-                                disabled={loading}
-                            >
-                                <Text className="text-white font-semibold">
-                                    {loading ? "Adding..." : "Add Device"}
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
+              <TouchableOpacity
+                onPress={handleLogout}
+                className="px-4 py-2 rounded-xl shadow"
+                style={{ backgroundColor: "#ef4444" }}
+              >
+                <Text className="text-white font-semibold">Logout</Text>
+              </TouchableOpacity>
+            </View>
 
-                        {loading ? (
-                            <View className="items-center py-8">
-                                <ActivityIndicator size="large" color={theme.text} />
-                                <Text className="mt-2" style={{ color: theme.text }}>
-                                    Loading devices...
-                                </Text>
-                            </View>
-                        ) : devices.length === 0 ? (
-                            <View className="items-center py-8">
-                                <Text className="text-lg" style={{ color: theme.text }}>
-                                    No devices connected
-                                </Text>
-                                <Text className="text-sm mt-2" style={{ color: theme.text }}>
-                                    Tap "Add Device" to get started
-                                </Text>
-                            </View>
-                        ) : (
-                            <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" }}>
-                                {devices.map((device, index) => (
-                                    <Link
-                                    key={device.deviceId || index}
-                                    href={`/device/${device.deviceId}`}
-                                    asChild
-                                    >
-                                    <TouchableOpacity
-                                        style={{
-                                        backgroundColor: theme.uiBackground,
-                                        borderColor: theme.text + "20",
-                                        borderWidth: 1,
-                                        borderRadius: 10,
-                                        padding: 16,
-                                        marginBottom: 12,
-                                        width: "48%", // ✅ makes two per row
-                                        }}
-                                    >
-                                        <View style={{ justifyContent: "space-between" }}>
-                                        <Text
-                                            style={{
-                                            color: theme.title,
-                                            fontWeight: "600",
-                                            fontSize: 16,
-                                            marginBottom: 4,
-                                            }}
-                                        >
-                                            {device.deviceName}
-                                        </Text>
+            {/* Devices Section */}
+            <View className="flex-row justify-between items-center mb-5">
+              <Text className="text-2xl font-semibold" style={{ color: theme.title }}>
+                Connected Devices
+              </Text>
 
-                                        </View>
-                                    </TouchableOpacity>
-                                    </Link>
-                                ))}
-                            </View>
+              <TouchableOpacity
+                onPress={addDevice}
+                disabled={loading}
+                className="px-4 py-2 rounded-xl shadow"
+                style={{ backgroundColor: loading ? "#93c5fd" : "#3b82f6" }}
+              >
+                <Text className="text-white font-semibold">
+                  {loading ? "Adding..." : "Add Device"}
+                </Text>
+              </TouchableOpacity>
+            </View>
 
-                        )}
+            {/* Device List */}
+            {loading ? (
+              <View className="items-center py-10">
+                <ActivityIndicator size="large" color={theme.text} />
+                <Text className="mt-3 opacity-80" style={{ color: theme.text }}>
+                  Loading devices...
+                </Text>
+              </View>
+            ) : devices.length === 0 ? (
+              <View className="items-center py-10">
+                <Text className="text-xl font-medium" style={{ color: theme.text }}>
+                  No devices connected
+                </Text>
+                <Text className="text-sm mt-2 opacity-70" style={{ color: theme.text }}>
+                  Tap "Add Device" to get started
+                </Text>
+              </View>
+            ) : (
+              <View
+                style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" }}
+              >
+                {devices.map((device, index) => (
+                  <Link
+                    key={device.deviceId || index}
+                    href={`/device/${device.deviceId}`}
+                    asChild
+                  >
+                    <TouchableOpacity
+                      className="rounded-2xl p-5 mb-4 shadow"
+                      style={{
+                        width: "48%",
+                        backgroundColor: theme.uiBackground,
+                        borderWidth: 1,
+                        borderColor: theme.text + "15",
+                      }}
+                    >
+                      <Text
+                        className="font-semibold text-lg mb-2"
+                        style={{ color: theme.title }}
+                      >
+                        {device.deviceName}
+                      </Text>
 
-
-                    </View>
-                </ScrollView>
-            </SafeAreaView>
-        </SafeAreaProvider>
+                      <Text className="opacity-60" style={{ color: theme.text }}>
+                        View details →
+                      </Text>
+                    </TouchableOpacity>
+                  </Link>
+                ))}
+              </View>
+            )}
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </SafeAreaProvider>
     );
 }
