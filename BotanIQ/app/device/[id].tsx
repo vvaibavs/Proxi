@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import { Modal, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { TextInput } from "react-native";
+import { BarChart } from "react-native-chart-kit";
+import { Dimensions } from "react-native";
 
 
 interface Device {
@@ -35,6 +37,10 @@ export default function DevicePage() {
     const [settingsVisible, setSettingsVisible] = useState(false);
     const [settingsText, setSettingsText] = useState("")
     const [tooClose, setTooClose] = useState(false)
+    const [laptop, setLaptop] = useState(0)
+    const [tv, setTv] = useState(0)
+    const [tablet, setTablet] = useState(0)
+    const [cellphone, setCellphone] = useState(0)
 
     const deviceID = id as string;
     const API_BASE_URL = 'http://localhost:3000/api';
@@ -79,7 +85,19 @@ export default function DevicePage() {
 
         const data = await response.json()
         setTime(data.time)
-        console.log(data)
+        const specResponse = await fetch(`${API_BASE_URL}/devices/${deviceID}/getSpecificTime`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
+
+        const specData = await specResponse.json()
+        setLaptop(specData.specificTimes["laptop"])
+        setTv(specData.specificTimes["tv"])
+        setTablet(specData.specificTimes["tablet"])
+        setCellphone(specData.specificTimes["cellphone"])
+
     }
 
     const screenTime = async () => {
@@ -98,7 +116,7 @@ export default function DevicePage() {
             // }
             const label = detectionData.screenType;
 
-            if (label === "laptop" || label === "tv") {
+            if (label === "laptop" || label === "tv" || label === "tablet" || label === "cell phone") {
 
                 // 3. GET the latest time before updating
                 const timeRes = await fetch(`${API_BASE_URL}/devices/${deviceID}/getTime`, {
@@ -127,6 +145,34 @@ export default function DevicePage() {
 
                 // 5. update local UI state
                 setTime(updated.device.screenTime);
+
+                const specTime = await fetch(`${API_BASE_URL}/devices/${deviceID}/getSpecificTime`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                })
+                const specData = await specTime.json()
+                const normalizedLabel = label.replace(" ", "")
+                console.log(specData.specificTimes[normalizedLabel])
+
+                specData.specificTimes[normalizedLabel] += 1
+
+
+                const updateSpec = await fetch(`${API_BASE_URL}/devices/${deviceID}/putSpecificTime`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        updatedTimes: specData.specificTimes
+                    })
+                })
+
+                const updatedSpec = await updateSpec.json()
+                await getTime();
+
             }
         } catch (err) {
             console.error("Screen time update error:", err);
@@ -259,6 +305,14 @@ export default function DevicePage() {
     // useEffect(() => {
     //     // Console.log(ScreenTime())
     // })
+    const formatSeconds = (s: number) => {
+        const mins = Math.floor(s / 60);
+        const secs = s % 60;
+        return `${mins}:${secs.toString().padStart(2, "0")}`;
+    };
+    const chartData = [laptop, tv, tablet, cellphone].map(d => +(d / 60).toFixed(2)) // convert seconds to minutes
+    const labels = ["Laptop", "TV", "Tablet", "Phone"];
+
 
     return (
             <SafeAreaProvider style={{ backgroundColor: theme.background }}>
@@ -342,18 +396,36 @@ export default function DevicePage() {
                             </Text>
 
                             <View
-                                style={{
-                                    backgroundColor: theme.background,
-                                    height: 160,
-                                    borderRadius: 16,
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                }}
-                            >
-                                <Text style={{ color: theme.text, opacity: 0.5 }}>
-                                    Graph coming soon...
-                                </Text>
-                            </View>
+  style={{
+    backgroundColor: theme.background,
+    borderRadius: 16,
+    paddingVertical: 10,
+    alignItems: "center",
+  }}
+>
+  <BarChart
+    data={{
+      labels,
+      datasets: [{ data: chartData }] // now in minutes
+    }}
+    width={Dimensions.get("window").width - 80}
+    height={220}
+    fromZero={true}
+    showValuesOnTopOfBars={true} // will now show decimal minutes
+    chartConfig={{
+      backgroundColor: theme.background,
+      backgroundGradientFrom: theme.background,
+      backgroundGradientTo: theme.background,
+      decimalPlaces: 1, // show 1 decimal place
+      color: (opacity = 1) => `rgba(75, 75, 255, ${opacity})`,
+      labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    }}
+    style={{
+      borderRadius: 12,
+    }}
+  />
+</View>
+
                         </View>
 
                     </ScrollView>

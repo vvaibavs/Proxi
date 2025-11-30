@@ -204,13 +204,34 @@ app.put("/api/devices/:deviceId/putTime", authenticateToken, async (req, res) =>
     }
 })
 
+// set specific time
+app.put('/api/devices/:deviceId/putSpecificTime', authenticateToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId);
+
+        const { deviceId } = req.params;
+        const {updatedTimes} = req.body
+
+        const device = user.devices.find(d => d.deviceId === deviceId);
+        console.log(device)
+        device.screenType = updatedTimes
+
+        await user.save()
+        res.json({
+            message: "times updated"
+        })
+    } catch(err) {
+        console.log(err)
+    }
+})
+
 app.get('/api/devices/:deviceId/getTime', authenticateToken, async (req, res) => {
     try {
         const user = await User.findById(req.user.userId);
 
         const { deviceId } = req.params;
         const device = user.devices.find(d => d.deviceId === deviceId);
-        console.log(device)
+        // console.log(device)
         res.json({
             message: 'time retrieved successfully',
             time: device.screenTime
@@ -220,6 +241,23 @@ app.get('/api/devices/:deviceId/getTime', authenticateToken, async (req, res) =>
     }
 })
 
+// get specific device times
+app.get('/api/devices/:deviceId/getSpecificTime', authenticateToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId);
+
+        const { deviceId } = req.params;
+        const device = user.devices.find(d => d.deviceId === deviceId);
+        console.log(device.screenType)
+
+        res.json({
+            message: 'times retrieved successfully',
+            specificTimes: device.screenType
+        })
+    } catch(err) {
+        console.log(err)
+    }
+})
 // Update device status route
 app.put('/api/devices/:deviceId/status', [
   authenticateToken,
@@ -312,6 +350,7 @@ app.put('/api/setNotifications', authenticateToken, async (req, res) => {
         res.status(500).json({ error: "Failed to add notification" });
     }
 });
+
 
 // get notifications
 app.get('/api/getNotifications', authenticateToken, async (req, res) => {

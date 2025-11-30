@@ -22,6 +22,12 @@ const deviceSchema = new mongoose.Schema({
   maxTime: {
     type: Number,
     default: 9999999
+  },
+  screenType: {
+    laptop: { type: Number, default: 0 },
+    tv: { type: Number, default: 0 },
+    tablet: { type: Number, default: 0 },
+    cellphone: { type: Number, default: 0 }
   }
 }, {
   timestamps: true
