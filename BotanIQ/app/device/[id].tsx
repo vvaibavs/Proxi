@@ -282,29 +282,6 @@ export default function DevicePage() {
         );
     }
 
-    // if (error || !deviceData) {
-    //     return (
-    //         <SafeAreaProvider style={{ backgroundColor: theme.background }}>
-    //             <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    //                 <Text className="text-lg text-center mb-4" style={{ color: theme.text }}>
-    //                     {error || 'Device not found'}
-    //                 </Text>
-    //                 <Text
-    //                     className="text-blue-500 underline"
-    //                     onPress={getDeviceData}
-    //                     style={{ color: Colors.primary }}
-    //                     >
-    //                     Try Again
-    //                 </Text>
-    //             </SafeAreaView>
-    //         </SafeAreaProvider>
-    //     );
-    // }
-
-
-    // useEffect(() => {
-    //     // Console.log(ScreenTime())
-    // })
     const formatSeconds = (s: number) => {
         const mins = Math.floor(s / 60);
         const secs = s % 60;
@@ -396,35 +373,35 @@ export default function DevicePage() {
                             </Text>
 
                             <View
-  style={{
-    backgroundColor: theme.background,
-    borderRadius: 16,
-    paddingVertical: 10,
-    alignItems: "center",
-  }}
->
-  <BarChart
-    data={{
-      labels,
-      datasets: [{ data: chartData }] // now in minutes
-    }}
-    width={Dimensions.get("window").width - 80}
-    height={220}
-    fromZero={true}
-    showValuesOnTopOfBars={true} // will now show decimal minutes
-    chartConfig={{
-      backgroundColor: theme.background,
-      backgroundGradientFrom: theme.background,
-      backgroundGradientTo: theme.background,
-      decimalPlaces: 1, // show 1 decimal place
-      color: (opacity = 1) => `rgba(75, 75, 255, ${opacity})`,
-      labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-    }}
-    style={{
-      borderRadius: 12,
-    }}
-  />
-</View>
+                                style={{
+                                    backgroundColor: theme.background,
+                                    borderRadius: 16,
+                                    paddingVertical: 10,
+                                    alignItems: "center",
+                                }}
+                                >
+                                <BarChart
+                                    data={{
+                                    labels,
+                                    datasets: [{ data: chartData }] // now in minutes
+                                    }}
+                                    width={Dimensions.get("window").width - 80}
+                                    height={220}
+                                    fromZero={true}
+                                    showValuesOnTopOfBars={true} // will now show decimal minutes
+                                    chartConfig={{
+                                    backgroundColor: theme.background,
+                                    backgroundGradientFrom: theme.background,
+                                    backgroundGradientTo: theme.background,
+                                    decimalPlaces: 1, // show 1 decimal place
+                                    color: (opacity = 1) => `rgba(75, 75, 255, ${opacity})`,
+                                    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                                    }}
+                                    style={{
+                                    borderRadius: 12,
+                                    }}
+                                />
+                                </View>
 
                         </View>
 
