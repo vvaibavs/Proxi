@@ -40,23 +40,52 @@ export default function RootLayout() {
     <AuthProvider>
       <Tabs
         screenOptions={{
-          headerStyle: { backgroundColor: theme.navBackground },
-          headerTintColor: theme.title,
-          tabBarStyle: {
-            backgroundColor: theme.navBackground,
-            borderTopWidth: 0,
-            height: 60,
+          headerStyle: { 
+            backgroundColor: theme.gradientStart,
+            borderBottomWidth: 0,
+            elevation: 0,
+            shadowOpacity: 0,
           },
-          tabBarActiveTintColor: theme.title,
-          tabBarInactiveTintColor: theme.subtleText,
+          headerTintColor: "#ffffff",
+          headerTitleStyle: {
+            fontWeight: "700",
+            fontSize: 20,
+          },
+          tabBarStyle: {
+            backgroundColor: theme.gradientStart,
+            borderTopWidth: 0,
+            height: 70,
+            paddingBottom: 10,
+            paddingTop: 10,
+            elevation: 20,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+          },
+          tabBarActiveTintColor: "#ffffff",
+          tabBarInactiveTintColor: "rgba(255, 255, 255, 0.6)",
+          tabBarLabelStyle: {
+            fontSize: 12,
+            fontWeight: "600",
+            marginTop: 4,
+          },
+          tabBarIconStyle: {
+            marginTop: 4,
+          },
         }}
       >
         <Tabs.Screen
           name="index"
           options={{
             title: "Home",
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="home-outline" size={size} color={color} />
+            headerShown: false,
+            tabBarIcon: ({ color, size, focused }) => (
+              <Ionicons 
+                name={focused ? "home" : "home-outline"} 
+                size={size} 
+                color={color} 
+              />
             ),
           }}
         />
@@ -65,8 +94,14 @@ export default function RootLayout() {
           name="notifications"
           options={{
             title: "Alerts",
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="notifications-outline" size={size} color={color} />
+            headerShown: true,
+            headerTitle: "Notifications",
+            tabBarIcon: ({ color, size, focused }) => (
+              <Ionicons 
+                name={focused ? "notifications" : "notifications-outline"} 
+                size={size} 
+                color={color} 
+              />
             ),
           }}
         />
@@ -75,8 +110,14 @@ export default function RootLayout() {
           name="dashboard"
           options={{
             title: "Dashboard",
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="grid-outline" size={size} color={color} />
+            headerShown: true,
+            headerTitle: "Dashboard",
+            tabBarIcon: ({ color, size, focused }) => (
+              <Ionicons 
+                name={focused ? "grid" : "grid-outline"} 
+                size={size} 
+                color={color} 
+              />
             ),
           }}
         />
@@ -85,6 +126,12 @@ export default function RootLayout() {
           name="device/[id]"
           options={{
             href: null,
+            headerShown: true,
+            headerTitle: "Device Details",
+            headerStyle: {
+              backgroundColor: theme.gradientStart,
+            },
+            headerTintColor: "#ffffff",
           }}
         />
 
@@ -92,6 +139,7 @@ export default function RootLayout() {
           name="signup"
           options={{
             href: null,
+            headerShown: false,
           }}
         />
       </Tabs>

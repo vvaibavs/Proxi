@@ -4,6 +4,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "../constants/colors";
 import { Link, router } from "expo-router";
 import { useAuth } from "../contexts/AuthContext";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function Dashboard() {
     const colorScheme = useColorScheme();
@@ -105,104 +106,220 @@ export default function Dashboard() {
     };
 
     return (
-    <SafeAreaProvider style={{ backgroundColor: theme.background }}>
-      <SafeAreaView>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View className="p-6">
-            {/* Header */}
-            <View className="flex-row justify-between items-center mb-8">
-              <View>
-                <Text className="text-4xl font-bold tracking-tight" style={{ color: theme.title }}>
-                  Dashboard
-                </Text>
-                {user && (
-                  <Text className="text-lg mt-1 opacity-80" style={{ color: theme.text }}>
-                    Welcome back, <Text className="font-semibold">{user.username}</Text>
+    <SafeAreaProvider>
+      <LinearGradient
+        colors={[theme.gradientStart, theme.gradientEnd]}
+        style={{ flex: 1 }}
+      >
+        <SafeAreaView style={{ flex: 1 }}>
+          <ScrollView 
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 20 }}
+          >
+            <View style={{ padding: 20 }}>
+              {/* Header */}
+              <View style={{ 
+                flexDirection: "row", 
+                justifyContent: "space-between", 
+                alignItems: "center", 
+                marginBottom: 30 
+              }}>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ 
+                    fontSize: 36, 
+                    fontWeight: "700", 
+                    color: "#ffffff",
+                    marginBottom: 4
+                  }}>
+                    Dashboard
                   </Text>
-                )}
+                  {user && (
+                    <Text style={{ 
+                      fontSize: 16, 
+                      color: "#e0e7ff",
+                      opacity: 0.9
+                    }}>
+                      Welcome back, <Text style={{ fontWeight: "600" }}>{user.username}</Text>
+                    </Text>
+                  )}
+                </View>
+
+                <TouchableOpacity
+                  onPress={handleLogout}
+                  style={{
+                    paddingHorizontal: 16,
+                    paddingVertical: 10,
+                    borderRadius: 12,
+                    backgroundColor: Colors.error,
+                    shadowColor: Colors.error,
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 8,
+                    elevation: 5,
+                  }}
+                  activeOpacity={0.8}
+                >
+                  <Text style={{ color: "#ffffff", fontWeight: "600", fontSize: 14 }}>
+                    Logout
+                  </Text>
+                </TouchableOpacity>
               </View>
 
-              <TouchableOpacity
-                onPress={handleLogout}
-                className="px-4 py-2 rounded-xl shadow"
-                style={{ backgroundColor: "#ef4444" }}
-              >
-                <Text className="text-white font-semibold">Logout</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Devices Section */}
-            <View className="flex-row justify-between items-center mb-5">
-              <Text className="text-2xl font-semibold" style={{ color: theme.title }}>
-                Connected Devices
-              </Text>
-
-              <TouchableOpacity
-                onPress={addDevice}
-                disabled={loading}
-                className="px-4 py-2 rounded-xl shadow"
-                style={{ backgroundColor: loading ? "#93c5fd" : "#3b82f6" }}
-              >
-                <Text className="text-white font-semibold">
-                  {loading ? "Adding..." : "Add Device"}
+              {/* Devices Section */}
+              <View style={{ 
+                flexDirection: "row", 
+                justifyContent: "space-between", 
+                alignItems: "center", 
+                marginBottom: 20 
+              }}>
+                <Text style={{ 
+                  fontSize: 24, 
+                  fontWeight: "700", 
+                  color: "#ffffff"
+                }}>
+                  Connected Devices
                 </Text>
-              </TouchableOpacity>
-            </View>
 
-            {/* Device List */}
-            {loading ? (
-              <View className="items-center py-10">
-                <ActivityIndicator size="large" color={theme.text} />
-                <Text className="mt-3 opacity-80" style={{ color: theme.text }}>
-                  Loading devices...
-                </Text>
+                <TouchableOpacity
+                  onPress={addDevice}
+                  disabled={loading}
+                  style={{
+                    paddingHorizontal: 16,
+                    paddingVertical: 10,
+                    borderRadius: 12,
+                    backgroundColor: loading ? Colors.primaryLight : Colors.primary,
+                    shadowColor: Colors.primary,
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 8,
+                    elevation: 5,
+                    opacity: loading ? 0.7 : 1,
+                  }}
+                  activeOpacity={0.8}
+                >
+                  <Text style={{ color: "#ffffff", fontWeight: "600", fontSize: 14 }}>
+                    {loading ? "Adding..." : "Add Device"}
+                  </Text>
+                </TouchableOpacity>
               </View>
-            ) : devices.length === 0 ? (
-              <View className="items-center py-10">
-                <Text className="text-xl font-medium" style={{ color: theme.text }}>
-                  No devices connected
-                </Text>
-                <Text className="text-sm mt-2 opacity-70" style={{ color: theme.text }}>
-                  Tap "Add Device" to get started
-                </Text>
-              </View>
-            ) : (
-              <View
-                style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" }}
-              >
-                {devices.map((device, index) => (
-                  <Link
-                    key={device.deviceId || index}
-                    href={`/device/${device.deviceId}`}
-                    asChild
-                  >
-                    <TouchableOpacity
-                      className="rounded-2xl p-5 mb-4 shadow"
-                      style={{
-                        width: "48%",
-                        backgroundColor: theme.uiBackground,
-                        borderWidth: 1,
-                        borderColor: theme.text + "15",
-                      }}
+
+              {/* Device List */}
+              {loading ? (
+                <View style={{ 
+                  alignItems: "center", 
+                  paddingVertical: 60,
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  borderRadius: 20,
+                  marginTop: 10,
+                }}>
+                  <ActivityIndicator size="large" color="#ffffff" />
+                  <Text style={{ 
+                    marginTop: 16, 
+                    color: "#e0e7ff",
+                    fontSize: 16,
+                    opacity: 0.9
+                  }}>
+                    Loading devices...
+                  </Text>
+                </View>
+              ) : devices.length === 0 ? (
+                <View style={{ 
+                  alignItems: "center", 
+                  paddingVertical: 60,
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  borderRadius: 20,
+                  marginTop: 10,
+                }}>
+                  <Text style={{ 
+                    fontSize: 20, 
+                    fontWeight: "600", 
+                    color: "#ffffff",
+                    marginBottom: 8
+                  }}>
+                    No devices connected
+                  </Text>
+                  <Text style={{ 
+                    fontSize: 14, 
+                    color: "#e0e7ff",
+                    opacity: 0.8,
+                    textAlign: "center"
+                  }}>
+                    Tap "Add Device" to get started
+                  </Text>
+                </View>
+              ) : (
+                <View
+                  style={{ 
+                    flexDirection: "row", 
+                    flexWrap: "wrap", 
+                    justifyContent: "space-between" 
+                  }}
+                >
+                  {devices.map((device, index) => (
+                    <Link
+                      key={device.deviceId || index}
+                      href={`/device/${device.deviceId}`}
+                      asChild
                     >
-                      <Text
-                        className="font-semibold text-lg mb-2"
-                        style={{ color: theme.title }}
+                      <TouchableOpacity
+                        style={{
+                          width: "48%",
+                          backgroundColor: "rgba(255, 255, 255, 0.95)",
+                          borderRadius: 20,
+                          padding: 20,
+                          marginBottom: 16,
+                          shadowColor: "#000",
+                          shadowOffset: { width: 0, height: 4 },
+                          shadowOpacity: 0.1,
+                          shadowRadius: 12,
+                          elevation: 5,
+                          borderWidth: 1,
+                          borderColor: "rgba(59, 130, 246, 0.2)",
+                        }}
+                        activeOpacity={0.8}
                       >
-                        {device.deviceName}
-                      </Text>
-
-                      <Text className="opacity-60" style={{ color: theme.text }}>
-                        View details →
-                      </Text>
-                    </TouchableOpacity>
-                  </Link>
-                ))}
-              </View>
-            )}
-          </View>
-        </ScrollView>
-      </SafeAreaView>
+                        <View style={{
+                          width: 48,
+                          height: 48,
+                          borderRadius: 24,
+                          backgroundColor: Colors.primary + "20",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          marginBottom: 12,
+                        }}>
+                          <Text style={{
+                            fontSize: 24,
+                            color: Colors.primary,
+                          }}>
+                            📱
+                          </Text>
+                        </View>
+                        <Text
+                          style={{ 
+                            fontSize: 18, 
+                            fontWeight: "600", 
+                            color: theme.title,
+                            marginBottom: 8
+                          }}
+                        >
+                          {device.deviceName}
+                        </Text>
+                        <Text style={{ 
+                          fontSize: 14, 
+                          color: Colors.primary,
+                          fontWeight: "500"
+                        }}>
+                          View details →
+                        </Text>
+                      </TouchableOpacity>
+                    </Link>
+                  ))}
+                </View>
+              )}
+            </View>
+          </ScrollView>
+        </SafeAreaView>
+      </LinearGradient>
     </SafeAreaProvider>
     );
 }

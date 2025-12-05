@@ -1,5 +1,5 @@
 import { useLocalSearchParams } from "expo-router";
-import { ScrollView, Text, useColorScheme, View, ActivityIndicator, Alert, Button } from "react-native";
+import { ScrollView, Text, useColorScheme, View, ActivityIndicator, Alert, Button, StyleSheet } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "../../constants/colors";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,6 +9,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { TextInput } from "react-native";
 import { BarChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 
 
 interface Device {
@@ -271,13 +272,18 @@ export default function DevicePage() {
 
     if (loading) {
         return (
-            <SafeAreaProvider style={{ backgroundColor: theme.background }}>
-                <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                    <ActivityIndicator size="large" color={Colors.primary} />
-                    <Text className="mt-4 text-lg" style={{ color: theme.text }}>
-                        Loading device data...
-                    </Text>
-                </SafeAreaView>
+            <SafeAreaProvider>
+                <LinearGradient
+                    colors={[theme.gradientStart, theme.gradientEnd]}
+                    style={{ flex: 1 }}
+                >
+                    <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <ActivityIndicator size="large" color="#ffffff" />
+                        <Text style={{ marginTop: 16, fontSize: 16, color: "#e0e7ff", opacity: 0.9 }}>
+                            Loading device data...
+                        </Text>
+                    </SafeAreaView>
+                </LinearGradient>
             </SafeAreaProvider>
         );
     }
@@ -292,187 +298,322 @@ export default function DevicePage() {
 
 
     return (
-            <SafeAreaProvider style={{ backgroundColor: theme.background }}>
-                <SafeAreaView style={{ flex: 1 }}>
-                    <ScrollView style={{ padding: 20 }}>
-
-                        {/* HEADER */}
-                        <View className="flex-row justify-between items-center mb-6">
-                            <View>
-                                <Text className="text-4xl font-extrabold" style={{ color: theme.title }}>
-                                    Demo Device
-                                </Text>
-                                <Text className="text-base opacity-60 mt-1" style={{ color: theme.text }}>
-                                    Monitoring & Insights
-                                </Text>
-                            </View>
-
-                            <Pressable
-                                onPress={() => setSettingsVisible(true)}
-                                style={{
-                                    padding: 10,
-                                    borderRadius: 50,
-                                    backgroundColor: theme.uiBackground,
-                                    shadowColor: "#000",
-                                    shadowOpacity: 0.15,
-                                    shadowRadius: 4,
-                                }}
-                            >
-                                <Ionicons name="settings-outline" size={24} color={theme.title} />
-                            </Pressable>
-                        </View>
-
-                        {/* SCREEN TIME CARD */}
-                        <View
-                            style={{
-                                backgroundColor: theme.uiBackground,
-                                padding: 20,
-                                borderRadius: 20,
-                                shadowColor: "#000",
-                                shadowOpacity: 0.07,
-                                shadowRadius: 10,
-                                marginBottom: 20,
-                            }}
+            <SafeAreaProvider>
+                <LinearGradient
+                    colors={[theme.gradientStart, theme.gradientEnd]}
+                    style={{ flex: 1 }}
+                >
+                    <SafeAreaView style={{ flex: 1 }}>
+                        <ScrollView 
+                            style={{ padding: 20 }}
+                            contentContainerStyle={{ paddingBottom: 20 }}
+                            showsVerticalScrollIndicator={false}
                         >
-                            <Text className="text-xl font-semibold mb-3" style={{ color: theme.title }}>
-                                Screen Time Today
-                            </Text>
-
-                            <View
-                                style={{
-                                    backgroundColor: theme.background,
-                                    height: 140,
-                                    borderRadius: 16,
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                }}
-                            >
-                                <Text className="text-4xl font-bold" style={{ color: theme.text }}>
-                                    {convertSecondsToMinutes(time)}
-                                </Text>
-                            </View>
-
-                            <Text style={{ color: theme.text, opacity: 0.6, marginTop: 10 }}>
-                                Max Allowed: {convertSecondsToMinutes(maxTime)}
-                            </Text>
-                        </View>
-
-                        {/* HISTORICAL CARD */}
-                        <View
-                            style={{
-                                backgroundColor: theme.uiBackground,
-                                padding: 20,
-                                borderRadius: 20,
-                                shadowColor: "#000",
-                                shadowOpacity: 0.07,
-                                shadowRadius: 10,
-                            }}
-                        >
-                            <Text className="text-xl font-semibold mb-3" style={{ color: theme.title }}>
-                                Historical Trends
-                            </Text>
-
-                            <View
-                                style={{
-                                    backgroundColor: theme.background,
-                                    borderRadius: 16,
-                                    paddingVertical: 10,
-                                    alignItems: "center",
-                                }}
-                                >
-                                <BarChart
-                                    data={{
-                                    labels,
-                                    datasets: [{ data: chartData }] // now in minutes
-                                    }}
-                                    width={Dimensions.get("window").width - 80}
-                                    height={220}
-                                    fromZero={true}
-                                    showValuesOnTopOfBars={true} // will now show decimal minutes
-                                    chartConfig={{
-                                    backgroundColor: theme.background,
-                                    backgroundGradientFrom: theme.background,
-                                    backgroundGradientTo: theme.background,
-                                    decimalPlaces: 1, // show 1 decimal place
-                                    color: (opacity = 1) => `rgba(75, 75, 255, ${opacity})`,
-                                    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                                    }}
-                                    style={{
-                                    borderRadius: 12,
-                                    }}
-                                />
+                            {/* HEADER */}
+                            <View style={{
+                                flexDirection: "row",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                marginBottom: 30,
+                            }}>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={{
+                                        fontSize: 36,
+                                        fontWeight: "700",
+                                        color: "#ffffff",
+                                        marginBottom: 4,
+                                    }}>
+                                        Demo Device
+                                    </Text>
+                                    <Text style={{
+                                        fontSize: 16,
+                                        color: "#e0e7ff",
+                                        opacity: 0.8,
+                                    }}>
+                                        Monitoring & Insights
+                                    </Text>
                                 </View>
 
-                        </View>
-
-                    </ScrollView>
-
-                    {/* SETTINGS MODAL */}
-                    <Modal visible={settingsVisible} transparent animationType="fade">
-                        <View
-                            style={{
-                                flex: 1,
-                                backgroundColor: "rgba(0,0,0,0.4)",
-                                justifyContent: "center",
-                                alignItems: "center",
-                            }}
-                        >
-                            <View
-                                style={{
-                                    width: "85%",
-                                    padding: 25,
-                                    backgroundColor: theme.uiBackground,
-                                    borderRadius: 20,
-                                }}
-                            >
-                                <Text className="text-2xl font-bold mb-4" style={{ color: theme.title }}>
-                                    Settings
-                                </Text>
-
-                                <Text className="mb-2" style={{ color: theme.text }}>
-                                    Set Max Screen Time (seconds)
-                                </Text>
-
-                                <TextInput
-                                    value={settingsText}
-                                    onChangeText={setSettingsText}
-                                    keyboardType="numeric"
-                                    placeholder="Enter seconds..."
-                                    style={{
-                                        backgroundColor: theme.background,
-                                        padding: 12,
-                                        borderRadius: 12,
-                                        marginBottom: 20,
-                                        borderWidth: 1,
-                                        borderColor: "#ddd",
-                                        color: theme.text,
-                                    }}
-                                />
-
                                 <Pressable
-                                    onPress={submitMaxTime}
+                                    onPress={() => setSettingsVisible(true)}
                                     style={{
-                                        backgroundColor: Colors.primary,
-                                        padding: 14,
-                                        borderRadius: 12,
-                                        alignItems: "center",
-                                        marginBottom: 10
+                                        padding: 12,
+                                        borderRadius: 28,
+                                        backgroundColor: "rgba(255, 255, 255, 0.2)",
+                                        borderWidth: 2,
+                                        borderColor: "rgba(255, 255, 255, 0.3)",
                                     }}
                                 >
-                                    <Text style={{ color: "#fff", fontSize: 16, fontWeight: "600" }}>
-                                        Save
-                                    </Text>
-                                </Pressable>
-
-                                <Pressable onPress={() => setSettingsVisible(false)}>
-                                    <Text style={{ color: Colors.primary, fontSize: 16, textAlign: "center" }}>
-                                        Close
-                                    </Text>
+                                    <Ionicons name="settings-outline" size={24} color="#ffffff" />
                                 </Pressable>
                             </View>
-                        </View>
-                    </Modal>
-                </SafeAreaView>
+
+                            {/* SCREEN TIME CARD */}
+                            <View style={{
+                                backgroundColor: "rgba(255, 255, 255, 0.95)",
+                                padding: 24,
+                                borderRadius: 24,
+                                shadowColor: "#000",
+                                shadowOffset: { width: 0, height: 4 },
+                                shadowOpacity: 0.1,
+                                shadowRadius: 12,
+                                elevation: 5,
+                                marginBottom: 20,
+                                borderWidth: 1,
+                                borderColor: "rgba(59, 130, 246, 0.2)",
+                            }}>
+                                <View style={{
+                                    flexDirection: "row",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    marginBottom: 16,
+                                }}>
+                                    <Text style={{
+                                        fontSize: 20,
+                                        fontWeight: "700",
+                                        color: theme.title,
+                                    }}>
+                                        Screen Time Today
+                                    </Text>
+                                    <View style={{
+                                        width: 40,
+                                        height: 40,
+                                        borderRadius: 20,
+                                        backgroundColor: Colors.primary + "20",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                    }}>
+                                        <Ionicons name="time-outline" size={20} color={Colors.primary} />
+                                    </View>
+                                </View>
+
+                                <LinearGradient
+                                    colors={[Colors.primary + "15", Colors.primaryLight + "10"]}
+                                    style={{
+                                        height: 160,
+                                        borderRadius: 20,
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        marginBottom: 12,
+                                    }}
+                                >
+                                    <Text style={{
+                                        fontSize: 48,
+                                        fontWeight: "700",
+                                        color: Colors.primary,
+                                    }}>
+                                        {convertSecondsToMinutes(time)}
+                                    </Text>
+                                </LinearGradient>
+
+                                <View style={{
+                                    flexDirection: "row",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    paddingTop: 12,
+                                    borderTopWidth: 1,
+                                    borderTopColor: theme.borderColor,
+                                }}>
+                                    <Text style={{
+                                        color: theme.text,
+                                        fontSize: 14,
+                                        opacity: 0.7,
+                                    }}>
+                                        Max Allowed:
+                                    </Text>
+                                    <Text style={{
+                                        color: Colors.primary,
+                                        fontSize: 16,
+                                        fontWeight: "600",
+                                    }}>
+                                        {convertSecondsToMinutes(maxTime)}
+                                    </Text>
+                                </View>
+                            </View>
+
+                            {/* HISTORICAL CARD */}
+                            <View style={{
+                                backgroundColor: "rgba(255, 255, 255, 0.95)",
+                                padding: 24,
+                                borderRadius: 24,
+                                shadowColor: "#000",
+                                shadowOffset: { width: 0, height: 4 },
+                                shadowOpacity: 0.1,
+                                shadowRadius: 12,
+                                elevation: 5,
+                                borderWidth: 1,
+                                borderColor: "rgba(59, 130, 246, 0.2)",
+                            }}>
+                                <View style={{
+                                    flexDirection: "row",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    marginBottom: 16,
+                                }}>
+                                    <Text style={{
+                                        fontSize: 20,
+                                        fontWeight: "700",
+                                        color: theme.title,
+                                    }}>
+                                        Historical Trends
+                                    </Text>
+                                    <View style={{
+                                        width: 40,
+                                        height: 40,
+                                        borderRadius: 20,
+                                        backgroundColor: Colors.primary + "20",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                    }}>
+                                        <Ionicons name="bar-chart-outline" size={20} color={Colors.primary} />
+                                    </View>
+                                </View>
+
+                                <View style={{
+                                    backgroundColor: "#f8fafc",
+                                    borderRadius: 16,
+                                    paddingVertical: 16,
+                                    paddingHorizontal: 8,
+                                    alignItems: "center",
+                                }}>
+                                    <BarChart
+                                        data={{
+                                            labels,
+                                            datasets: [{ data: chartData }]
+                                        }}
+                                        width={Dimensions.get("window").width - 96}
+                                        height={220}
+                                        fromZero={true}
+                                        showValuesOnTopOfBars={true}
+                                        chartConfig={{
+                                            backgroundColor: "#f8fafc",
+                                            backgroundGradientFrom: "#f8fafc",
+                                            backgroundGradientTo: "#f8fafc",
+                                            decimalPlaces: 1,
+                                            color: (opacity = 1) => Colors.primary,
+                                            labelColor: (opacity = 1) => `rgba(30, 41, 59, ${opacity})`,
+                                            barPercentage: 0.7,
+                                        }}
+                                        style={{
+                                            borderRadius: 12,
+                                        }}
+                                    />
+                                </View>
+                            </View>
+                        </ScrollView>
+
+                        {/* SETTINGS MODAL */}
+                        <Modal visible={settingsVisible} transparent animationType="fade">
+                            <View style={{
+                                flex: 1,
+                                backgroundColor: "rgba(0,0,0,0.5)",
+                                justifyContent: "center",
+                                alignItems: "center",
+                            }}>
+                                <View style={{
+                                    width: "85%",
+                                    maxWidth: 400,
+                                    padding: 28,
+                                    backgroundColor: "#ffffff",
+                                    borderRadius: 24,
+                                    shadowColor: "#000",
+                                    shadowOffset: { width: 0, height: 10 },
+                                    shadowOpacity: 0.2,
+                                    shadowRadius: 20,
+                                    elevation: 10,
+                                }}>
+                                    <View style={{
+                                        flexDirection: "row",
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                        marginBottom: 20,
+                                    }}>
+                                        <Text style={{
+                                            fontSize: 24,
+                                            fontWeight: "700",
+                                            color: theme.title,
+                                        }}>
+                                            Settings
+                                        </Text>
+                                        <Pressable onPress={() => setSettingsVisible(false)}>
+                                            <Ionicons name="close-circle" size={28} color={theme.text} />
+                                        </Pressable>
+                                    </View>
+
+                                    <Text style={{
+                                        fontSize: 14,
+                                        fontWeight: "600",
+                                        color: theme.text,
+                                        marginBottom: 8,
+                                    }}>
+                                        Set Max Screen Time (seconds)
+                                    </Text>
+
+                                    <TextInput
+                                        value={settingsText}
+                                        onChangeText={setSettingsText}
+                                        keyboardType="numeric"
+                                        placeholder="Enter seconds..."
+                                        placeholderTextColor={theme.text + "60"}
+                                        style={{
+                                            backgroundColor: "#f8fafc",
+                                            padding: 16,
+                                            borderRadius: 12,
+                                            marginBottom: 24,
+                                            borderWidth: 1.5,
+                                            borderColor: theme.borderColor,
+                                            color: theme.title,
+                                            fontSize: 16,
+                                        }}
+                                    />
+
+                                    <Pressable
+                                        onPress={() => {
+                                            submitMaxTime();
+                                            setSettingsVisible(false);
+                                        }}
+                                        style={{
+                                            backgroundColor: Colors.primary,
+                                            padding: 16,
+                                            borderRadius: 12,
+                                            alignItems: "center",
+                                            marginBottom: 12,
+                                            shadowColor: Colors.primary,
+                                            shadowOffset: { width: 0, height: 4 },
+                                            shadowOpacity: 0.3,
+                                            shadowRadius: 8,
+                                            elevation: 5,
+                                        }}
+                                    >
+                                        <Text style={{
+                                            color: "#fff",
+                                            fontSize: 16,
+                                            fontWeight: "600",
+                                        }}>
+                                            Save Settings
+                                        </Text>
+                                    </Pressable>
+
+                                    <Pressable
+                                        onPress={() => setSettingsVisible(false)}
+                                        style={{
+                                            padding: 12,
+                                            alignItems: "center",
+                                        }}
+                                    >
+                                        <Text style={{
+                                            color: Colors.primary,
+                                            fontSize: 15,
+                                            fontWeight: "500",
+                                        }}>
+                                            Cancel
+                                        </Text>
+                                    </Pressable>
+                                </View>
+                            </View>
+                        </Modal>
+                    </SafeAreaView>
+                </LinearGradient>
             </SafeAreaProvider>
     );
 }
